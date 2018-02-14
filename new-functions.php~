@@ -1,0 +1,82 @@
+<?php
+
+
+function assignPostToFormArray($form_array)
+{
+	foreach($form_array as $key => $array)
+	{
+		$form_array[$key]['value'] = htmlentities($_POST[$form_array[$key]['name']]);
+	}
+	return $form_array;
+}
+
+
+function validateFormArray($form_array)
+{
+	foreach($form_array as $key => $array)
+	{
+		if($form_array[$key]['validate']='not_blank')
+		{
+			if(false === $form_array[$key]['value'] || (empty($form_array[$key]['value']) && '0' != $form_array[$key]['value']))
+			{
+				$form_array[$key]['error_mssg'] .= 'This field can not be empty';
+			}
+		}
+	}
+	return $form_array;
+}
+
+
+function isFormValid($form_array)
+{
+	foreach($form_array as $key => $array)
+	{
+		if($form_array[$key]['error_mssg'] != "")
+		{
+			$is_form_valid = false;
+		}	else  
+			{
+				$is_form_valid = true;
+			}
+	}
+	return $is_form_valid;
+}
+
+/*
+function showForm($action, $form_array)	{
+	$form = "<form method='post' action=".$action.">";
+	foreach($form_array as $key => $value) {
+		$form .= "<p><label>".$form_array[$key]['form_label'].": <input name='".$key."' type='".$form_array[$key]['type']."' value='".$form_array[$key]['value']."'></label></p>";
+	}
+	$form .= "<input type='submit'> <a href='index.php'> Cancel </a></form></br>";
+	return $form;
+}
+*/
+
+function showForm($action, $form_array)	{
+	$form = "<form method='post' action=".$action.">";
+	foreach($form_array as $key => $value) {
+		$form .= "<p><label>".$form_array[$key]['form_label'];
+		if($form_array[$key]['type']=='select') {
+			$form .= " <select name='".$form_array[$key]['name']."'>";
+			foreach($form_array[$key]['options'] as $key_2 => $value_2) {
+				$form .= "<option value=".$key_2.">".$value_2."</option>";
+			}
+			$form .= "</select";
+		} else {
+			
+			$form .= " <input name='".$form_array[$key]['name']
+				."' type='".$form_array[$key]['type']
+				."' value='".$form_array[$key]['value']
+				."'";
+				
+				
+			if(isset($form_array[$key]['required'])) {
+				$form .=" required";
+			}				
+		}
+	$form .=	"></label></p>";
+	}
+	$form .= "<input type='submit'> <a href='index.php'> Cancel </a></form></br>";
+	return $form;
+}

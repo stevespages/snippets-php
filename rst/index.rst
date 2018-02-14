@@ -1,0 +1,93 @@
+.. Thing documentation master file, created by
+   sphinx-quickstart on Wed Jan 31 12:37:44 2018.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Thing
+=====
+
+Table column set to unique: gotcha!
+-----------------------------------
+One of the database fields (snippet, I think) is set to 'unique'. So if you submit the form with a value for snippet that already exists in the database then a row will not be added to the database. If you are not aware of this you might think the app is broken and spend hours trying to fix it! To prevent this and for a better user experience it would be nice to alert the user when they try and submit a form with a value for 'snippet' that already exists....
+
+Correct Binding of Parameters in PDO statements
+-----------------------------------------------
+
+The functions below all insert data into a table so long as there are no quotation marks in the values. When there are quotation marks in the values only saveB() correctly stores the values in the database. The others are clearly not protected agains SQL injection issues.::
+	
+	<?php
+	
+	$host = '127.0.0.1';
+	$db   = 'testing_pdo';
+	$charset = 'utf8mb4';
+	$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+	$user = 'root';
+	$pass = '';
+	$opt = [
+	    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+	    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+	    PDO::ATTR_EMULATE_PREPARES   => false,
+	];
+	$pdo = new PDO($dsn, $user, $pass, $opt);
+	
+	
+	function saveA($pdo)
+	{
+		$fields = "first_name, last_name";
+		$first_name = "'An'na'";
+		$last_name = "'Ad'ams'";
+		$sql = "INSERT INTO person_2 ($fields) VALUES ($first_name, $last_name)";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+		return $stmt;
+	}
+	
+	function saveB($pdo)
+	{
+		$fields = "first_name, last_name";
+		$first_name = "Be'cky";
+		$last_name = "Br'own";
+		$sql = "INSERT INTO person_2 ($fields) VALUES (?, ?)";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute([$first_name, $last_name]);
+		return $stmt;
+	}
+	
+	function saveC($pdo)
+	{
+		$fields = "first_name, last_name";
+		$values = "'Cl'aire', 'Co'oper'";
+		$sql = "INSERT INTO person_2 ($fields) VALUES ($values)";
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+		return $stmt;
+	}
+	
+	$stmt_a = saveA($pdo);//Throws an error
+	$stmt_b = saveB($pdo);//Stores Cl'aire and Co'oper in the database as it should
+	$stmt_c = saveC($pdo);//Throws an error
+	
+	var_dump($stmt_a);
+	echo '</br>';
+	var_dump($stmt_b);
+	echo '</br>';
+	var_dump($stmt_c);
+
+I have been using `$name = htmlentities($_POST['name']);` to pass submitted form values into my data. I am not sure what it does. The following code prints O'Hara out twice exactly the same in each case::
+
+	<?php
+	$name = "O'Hara";
+	$htmlentities_name = htmlentities($name);
+	echo $name;
+	echo '</br>';
+	echo $htmlentities_name;
+	
+But `$htmlentities_name = htmlentities($name, ENT_QUOTES);` ....
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+* :ref:`search`
+

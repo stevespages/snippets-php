@@ -1,0 +1,57 @@
+<?php
+
+$host = '127.0.0.1';
+$db   = 'testing_pdo';
+$charset = 'utf8mb4';
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$user = 'root';
+$pass = '';
+$opt = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+$pdo = new PDO($dsn, $user, $pass, $opt);
+
+
+function saveA($pdo)
+{
+	$fields = "first_name, last_name";
+	$first_name = "'Anna'";
+	$last_name = "'Adams'";
+	$sql = "INSERT INTO person_2 ($fields) VALUES ($first_name, $last_name)";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute();
+	return $stmt;
+}
+
+function saveB($pdo)
+{
+	$fields = "first_name, last_name";
+	$first_name = "Be'cky";
+	$last_name = "Br'own";
+	$sql = "INSERT INTO person_2 ($fields) VALUES (?, ?)";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute([$first_name, $last_name]);
+	return $stmt;
+}
+
+function saveC($pdo)
+{
+	$fields = "first_name, last_name";
+	$values = "'Cl'aire', 'Co'oper'";
+	$sql = "INSERT INTO person_2 ($fields) VALUES ($values)";
+	$stmt = $pdo->prepare($sql);
+	$stmt->execute();
+	return $stmt;
+}
+
+$stmt_a = saveA($pdo);
+$stmt_b = saveB($pdo);
+$stmt_c = saveC($pdo);
+
+var_dump($stmt_a);
+echo '</br>';
+var_dump($stmt_b);
+echo '</br>';
+var_dump($stmt_c);

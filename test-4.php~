@@ -1,0 +1,25 @@
+<?php
+
+$dbh = new PDO("mysql:host=localhost;dbname=testing_pdo;charset=utf8mb4", "root", "");
+
+function one($dbh)
+{
+	$stmt = $dbh->prepare("INSERT INTO person_2 (first_name, last_name) VALUES ('Fred', 'Smith')");
+	$stmt->execute();
+	return $stmt;
+}
+
+function two($dbh)
+{
+	$stmt = $dbh->prepare("INSERT INTO person_2 (first_name, last_name) VALUES (?, ?)");
+	$stmt->bindParam($first_name, $last_name);
+	$first_name = 'Sue';
+	$last_name = 'Perkins';
+	$stmt->execute();
+	return $stmt;
+}
+
+//CREATE TABLE person_2 (first_name VARCHAR(50), last_name VARCHAR(50));'
+
+$x = one($dbh);
+var_dump($x);

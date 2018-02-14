@@ -1,0 +1,81 @@
+<?php
+
+include_once 'functions.php';
+include_once 'database-functions.php';
+$host = '127.0.0.1';
+$db   = 'testing_pdo';
+$charset = 'utf8mb4';
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$user = 'root';
+$pass = '';
+$opt = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+$pdo = new PDO($dsn, $user, $pass, $opt);
+
+$example_form_array = array ( 
+			"first_name" => array (
+						"name" => "first_name",
+						"value" => "Maria"
+						),
+			"last_name" => array (
+						"name" => "last_name",
+						"value" => "D'Angelo"
+						)
+);
+
+function saveA($pdo)
+{
+	$fields = "first_name, last_name";
+	$first_name = "Be'cky";
+	$last_name = "O'Hanlan";
+	$sql = "INSERT INTO person_2 ($fields) VALUES (?, ?)";
+	$statement = $pdo->prepare($sql);
+	$statement->execute([$first_name, $last_name]);
+	return $statement;
+}
+
+function saveB($pdo)
+{
+	$fields = "first_name, last_name";
+	$first_name = "Arnold";
+	$last_name = "O'Brien";
+	$var = [$first_name, $last_name];
+	$sql = "INSERT INTO person_2 ($fields) VALUES (?, ?)";
+	$statement = $pdo->prepare($sql);
+	$statement->execute($var);
+	return $statement;
+}
+
+function saveC($pdo)
+{
+	$fields = "first_name, last_name";
+	$first_name = "Shamus";
+	$last_name = "O'Dowd";
+	$var = [$fields, $first_name, $last_name];
+	$sql = "INSERT INTO person_2 ([?]) VALUES (?, ?)";
+	$statement = $pdo->prepare($sql);
+	$statement->execute($var);
+	return $statement;
+}
+
+
+//$statement = saveB($pdo);
+
+$fields = $statement = save('person_2', $example_form_array, $pdo);
+
+//var_dump($statement);
+
+//echo '<pre>';
+//var_dump($fields);
+//echo '</pre>';
+
+$statement_1 = getAll('person_2', $pdo);
+//$table = createTable($statement_1);
+
+echo '<!DOCTYPE html><html><head><meta charset="utf-8" /><title></title></head>';
+//echo $table;
+echo '</br>';
+echo '<body></body></html>';

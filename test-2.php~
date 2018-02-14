@@ -1,0 +1,31 @@
+<?php
+
+//$dbh = new PDO("mysql:host=localhost;dbname=testing_pdo;charset=utf8mb4", "root", "");
+$db = new PDO("mysql:host=localhost;dbname=snippets;charset=utf8mb4", "root", "");
+
+
+function one()
+{
+	$stmt = $dbh->prepare("SELECT * FROM people");
+	//$stmt = $dbh->prepare(INSERT INTO people (first_name, age) VALUES ('Fred', 35));
+	$stmt->execute;
+}
+
+function two()
+{
+	$stmt = $dbh->prepare("INSERT INTO people (first_name, age) VALUES (?, ?)");
+	$stmt->bindParam(1, 'Jack');
+	$stmt->bindParam(2, 7);
+	$stmt->execute;
+}
+
+function three()
+{
+	$stmt = $db->prepare("SELECT * FROM snip")
+	
+}
+
+//$create_table = 'CREATE TABLE person (first_name VARCHAR(50), age INT)';
+
+$x = three();
+var_dump($x);
