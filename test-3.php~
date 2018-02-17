@@ -1,9 +1,0 @@
-<?php
-
-function myFunction()
-{
-	$x = 'Hallo';
-	return $x;
-}
-
-myFunction();
