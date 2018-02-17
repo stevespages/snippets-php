@@ -82,6 +82,8 @@ $snippet_form_array = array (
 						)
 );
 
+// VIEW
+
 // CONTROLLER
 
 $action = "index.php";
@@ -134,7 +136,7 @@ $snippet_form = showForm($action, $snippet_form_array);
 $statement = getAll('snip', $pdo);
 $snippet_table = createTable($statement, true);
 
-// VIEW
+// TEMPLATE
 $template = '
 <!DOCTYPE html>
 <html lang="en">
