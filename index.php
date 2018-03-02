@@ -34,10 +34,18 @@ $opt = [
 $pdo = new PDO($dsn, $user, $pass, $opt);
 
 // MODEL
-// primary keys are the values of the name attributes of the form input elements...
+// $form_arrays:...
+// ...primary keys are the values of the name attributes of the form input elements...
 // ... and the names of the corresponding columns in a MySQL (or other) table.
 // Most but not necessarily all the secondary keys are required to avoid an 'undefined index' error.
-$snippet_form_array = array ( 
+
+// VIEW
+
+// CONTROLLER
+
+function home($pdo)
+{
+    $snippet_form_array = array ( 
 			"snippet" => array (
 						"name" => "snippet",
 						"required" => "required",
@@ -80,68 +88,69 @@ $snippet_form_array = array (
 										),
 						"validate" => ""
 						)
-);
-
-// VIEW
-
-// CONTROLLER
-
-$action = "index.php";
-If (isset($_GET['id'])) {
-		$id = htmlentities($_GET['id']); // this is necessary for editing and deleting a particular row
-}
-
-If ($_SERVER['REQUEST_METHOD'] == 'POST')	{
-	$snippet_form_array = assignPostToFormArray($snippet_form_array);
-	$snippet_form_array = validateFormArray($snippet_form_array, $pdo, 'snip');
-	$is_form_valid = isFormValid($snippet_form_array);
-
-	
-    if($is_form_valid === true AND !isset($_GET['id'])) {
-        save('snip', $snippet_form_array, $pdo); // saves post as a new row
+    );
+    $action = "index.php";
+    If (isset($_GET['id'])) {
+        $id = htmlentities($_GET['id']); // this is necessary for editing and deleting a particular row
     }
+
+    If ($_SERVER['REQUEST_METHOD'] == 'POST')	{
+        $snippet_form_array = assignPostToFormArray($snippet_form_array);
+        $snippet_form_array = validateFormArray($snippet_form_array, $pdo, 'snip');
+        $is_form_valid = isFormValid($snippet_form_array);
+
 	
-	// $_GET['id'] is set because the value of the form's action attribute was set...
-	// ...to ?id=.$id when the form was generated from clicking on the Edit hyperlink
-	if($is_form_valid === true AND isset($_GET['id'])) {
-		updateRow('snip', $snippet_form_array, $id, $pdo);  // updates a row from an edited post
-	}
+        if($is_form_valid === true AND !isset($_GET['id'])) {
+            save('snip', $snippet_form_array, $pdo); // saves post as a new row
+        }
 	
-	// if $is_form_valid does not === true then $form_array needs to be passed to showForm() with...
-	// ...its values and error messages intact.
-	// if $is_form_valid === true then the job has been done and we need to refresh the page for a new start.
-    if($is_form_valid === true) {
-        header('Location: index.php');
+	     // $_GET['id'] is set because the value of the form's action attribute was set...
+	     // ...to ?id=.$id when the form was generated from clicking on the Edit hyperlink
+	     if($is_form_valid === true AND isset($_GET['id'])) {
+		      updateRow('snip', $snippet_form_array, $id, $pdo);  // updates a row from an edited post
+	     }
+	
+	     // if $is_form_valid does not === true then $form_array needs to be passed to showForm() with...
+	     // ...its values and error messages intact.
+	     // if $is_form_valid === true then the job has been done and we need to refresh the page for a new start.
+        if($is_form_valid === true) {
+            header('Location: index.php');
+        }
     }
-}
 
-If ($_SERVER['REQUEST_METHOD'] != 'POST' AND isset($_GET['id']))	{
-
-			if($_GET['pg']=='edit') {
-				$action .= "?id=".$id;
+    If ($_SERVER['REQUEST_METHOD'] != 'POST' AND isset($_GET['id']))	{
+        if($_GET['pg']=='edit') {
+            $action .= "?id=".$id;
 				$statement = getRowToEdit('snip', $id, $pdo); // gets a row to be edited using id of the row
 				$row = $statement->fetchObject();
-				
 				foreach($snippet_form_array as $key => $array) {
 					$snippet_form_array[$key]['value'] = $row->$key;
 				}			
-			}
-			if($_GET['pg']=='delete') {
-				deleteRow('snip', $id, $pdo); // deletes a row using id of the row
-			header('Location: index.php');
-			}
+        }
+        if($_GET['pg']=='delete') {
+            deleteRow('snip', $id, $pdo); // deletes a row using id of the row
+            header('Location: index.php');
+        }
+    }
+    $snippet_form = showForm($action, $snippet_form_array);
+    $statement = getAll('snip', $pdo);
+    $snippet_table = createTable($statement, true);
+    $home = array ($snippet_form, $snippet_table);
+    return $home;
 }
 
-$snippet_form = showForm($action, $snippet_form_array);
-$statement = getAll('snip', $pdo);
-$snippet_table = createTable($statement, true);
+$contrl = getControllerName();
+$navigation = array("index.php");
+$title = ucfirst($contrl);
+$title = str_replace('-', ' ', $title);
+$content = $contrl($pdo);
 
 // TEMPLATE
 $template = '
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Thing</title>
+  <title>'.$title.'</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -154,11 +163,11 @@ $template = '
 <div class="container-fluid">
 <h1>Snippets</h1>
 <div class="row">
-  <div class="col-sm">'.$snippet_form.'</div>
+  <div class="col-sm">'.$content[0].'</div>
 </div>
 
 <div class="row">
-  <div class="col-sm">'.$snippet_table.'</div>
+  <div class="col-sm">'.$content[1].'</div>
 </div>
 
 </div>
