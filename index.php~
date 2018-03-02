@@ -135,7 +135,8 @@ function home($pdo)
     $snippet_form = showForm($action, $snippet_form_array);
     $statement = getAll('snip', $pdo);
     $snippet_table = createTable($statement, true);
-    return $snippet_form;
+    $home = array ($snippet_form, $snippet_table);
+    return $home;
 }
 
 $contrl = getControllerName();
@@ -162,11 +163,11 @@ $template = '
 <div class="container-fluid">
 <h1>Snippets</h1>
 <div class="row">
-  <div class="col-sm">'.$content.'</div>
+  <div class="col-sm">'.$content[0].'</div>
 </div>
 
 <div class="row">
-  <div class="col-sm">'.$content.'</div>
+  <div class="col-sm">'.$content[1].'</div>
 </div>
 
 </div>
